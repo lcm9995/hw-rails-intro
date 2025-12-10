@@ -5,20 +5,27 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = Movie.all_ratings
 
-    # -- Filter Section --
+    # --- RATING FILTER PERSISTENCE ---
     if params[:ratings].present?
       @ratings_to_show = params[:ratings].keys
+      session[:ratings] = params[:ratings] # save hash, not array
+    elsif session[:ratings].present?
+      @ratings_to_show = session[:ratings].keys
     else
       @ratings_to_show = @all_ratings
     end
 
-    @movies = Movie.with_ratings(@ratings_to_show)
-
-    # -- Sorting Section --
-    @sort_by = params[:sort_by]   # can be 'title' or 'release_date'
-    if @sort_by.present?
-      @movies = @movies.order(@sort_by)
+    # --- SORTING PERSISTENCE ---
+    if params[:sort_by].present?
+      @sort_by = params[:sort_by]
+      session[:sort_by] = @sort_by
+    elsif session[:sort_by].present?
+      @sort_by = session[:sort_by]
     end
+
+    # FINAL QUERY
+    @movies = Movie.with_ratings(@ratings_to_show)
+    @movies = @movies.order(@sort_by) if @sort_by.present?
   end
 
     # GET /movies/1 or /movies/1.json
