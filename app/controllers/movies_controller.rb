@@ -5,7 +5,7 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = Movie.all_ratings
 
-    # What the user selected (or default all)
+    # -- Filter Section --
     if params[:ratings].present?
       @ratings_to_show = params[:ratings].keys
     else
@@ -13,6 +13,12 @@ class MoviesController < ApplicationController
     end
 
     @movies = Movie.with_ratings(@ratings_to_show)
+
+    # -- Sorting Section --
+    @sort_by = params[:sort_by]   # can be 'title' or 'release_date'
+    if @sort_by.present?
+      @movies = @movies.order(@sort_by)
+    end
   end
 
     # GET /movies/1 or /movies/1.json
